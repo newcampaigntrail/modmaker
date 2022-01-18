@@ -87,7 +87,6 @@ Candidate Number: <input id="candnum"/><button id="setCand" onclick="setCandNum(
     }
 
     election_json = JSON.stringify([{"model": "campaign_trail.election","pk":pk,"fields":{"year":year,"summary":"<p>"+desc+"</p>","image_url": "\"+elec_pic+\"","winning_electoral_vote_number": 270,"advisor_url": "\"+adv_pic+\"","recommended_reading":"reading is for nerds","has_visits": 1,"no_electoral_majority_image": "\"+hung+\""}}]);
-    console.log(election_json)
 
     temp_election_list = "[{\"id\":"+pk+",\"year\":"+year+",\"is_premium\":0,\"display_year\":\""+year+"\"}]"
 
@@ -118,12 +117,12 @@ Candidate Number: <input id="candnum"/><button id="setCand" onclick="setCandNum(
       cand_hung = getElementsById("cand_hung")[r].value
 
       vp_comrade = getElementsById("cand_vp_with")[r].value
-      vp_comrade_id = getElementsById("cand_pk")[vp_comrade].value
       running_combo = getElementsById("cand_running_id")[r].value
 
       active = !getElementsById("cand_vp_check")[r].checked
 
       if (!active) {
+        vp_comrade_id = getElementsById("cand_pk")[Number(vp_comrade)].value
         vp_desc = getElementsById("cand_vp_desc")[r].value
         vp_json.append({"model": "campaign_trail.running_mate","pk": Number(running_combo),"fields": {"candidate": Number(vp_comrade_id),"running_mate": Number(c_pk)}})
       } else {
