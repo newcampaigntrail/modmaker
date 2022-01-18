@@ -1,1 +1,201 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en-US">
+<head>
+<title>Campaign Trail - Mod Maker</title>
+<link rel="stylesheet" href="../static/amusa_main_2016032801.css" type="text/css" media="screen" />
+<link rel="shortcut icon" href="../static/34starcircle-2.png" />
 
+<link rel="canonical" href="index.html" />
+<meta name="description" content="A quick and easy mod maker for the Campaign Trail/New Campaign Trail election games. Make any elections you want to!" />
+<meta property="og:title" content="New Campaign Trail - Mod Maker" />
+<meta property="og:type" content="website" />
+<meta property="og:image" content="../static/images/presidential-election-collage-section.jpg" />
+<meta property="og:image:type" content="image/jpeg" /> 
+<meta property="og:image:width" content="200" />
+<meta property="og:image:height" content="200" />
+<meta property="og:url" content="index.html" />
+<meta property="og:description" content="A quick and easy mod maker for the Campaign Trail/New Campaign Trail election games. Make any elections you want to!" />
+<meta property="og:site_name" content="New Campaign Trail" />
+</head>
+<body>
+
+<h3>Election Details</h3>
+<div id="election_details">
+  Year: <input id="year_field" /><br>
+  Id (optional): <input id="elec_pk_field" /><br>
+  Description:<br> <textarea width="300" height="250" id="elec_desc_field"></textarea><br>
+  Election Photo (link): <input id="elec_photo" /><br>
+  Advisor Photo (link): <input id="advisor_photo" /><br>
+  No Electoral Majority Photo (link, optional): <input id="no_elec_maj_photo" /><br>
+</div>
+<br><br>
+<h3>Candidate Details</h3>
+<i>Include VPs in this, simply check the VP candidate box to set it up.<br><br><b>Warning: setting candidate count will delete everything currently in the candidate fields.</b></i><br><br>
+Candidate Number: <input id="candnum"/><button id="setCand" onclick="setCandNum()">Set</button><br>
+<div id="candidate_details">
+  <br><br>
+  <h4>Name:<br></h4>
+  First Name: <input id='cand_firstname' /><br>
+  Last Name: <input id='cand_lastname' /><br>
+  Id (optional): <input id='cand_pk' /><br>
+  Description (leave blank for VP): <br><textarea id='cand_desc' /></textarea><br>
+  Party: <input id='cand_pol_party' /><br>
+  Home State (as string): <input id='home_state' /><br>
+  Primary Party Colour (hex): <input id='cand_col_1' /><br>
+  Secondary Party Colour (hex, generally unimportant): <input id='cand_col_2' /><br>
+  VP?: <input id='cand_vp_check' type="checkbox" onclick="reveal('vpshit', 'cand_vp_check')" /><br>
+  <div id="vpshit" style="display:none"><br>
+    Description as Running Mate: <br><textarea id='cand_vp_desc'></textarea><br>
+    Running with? (input number in list of candidates so far): <input id='cand_vp_with' /><br>
+  <br><br></div>
+  Portrait (link): <input id='cand_portrait' /><br>
+  Victory Message (leave blank for VP): <br><textarea id='cand_win'></textarea><br>
+  Loss Message (leave blank for VP): <br><textarea id='cand_lose'></textarea><br>
+  No Majority Message (leave blank for VP): <br><textarea id='cand_hung'></textarea><br>
+
+</div>
+
+<br><br><br><button id="generate_code" onclick="genCode()">Generate!</button>
+
+</body>
+
+<script src="../../ajax.googleapis.com/ajax/libs/jquery/1.11.1/jquery.min.js"></script>
+<script>
+
+  function genCode() {
+    code1 = ""
+
+    // election_json gen
+    year = document.getElementById("year_field").value
+
+    if (document.getElementById("elec_pk_field").value == "") {
+      pk = 420
+    } else {
+      pk = document.getElementById("elec_pk_field").value
+    }
+
+    desc = document.getElementById("elec_desc_field").value
+    elec_pic = document.getElementById("elec_photo").value
+    adv_pic = document.getElementById("advisor_photo").value
+
+    if (document.getElementById("no_elec_maj_photo").value == "") {
+      hung = "../static/images/2012-no-majority.jpg"
+    } else {
+      hung = document.getElementById("no_elec_maj_photo").value
+    }
+
+    election_json = "[{\"model\": \"campaign_trail.election\",\"pk\":"+pk+",\"fields\":{\"year\":"+year+",\"summary\":\"<p>"+desc+"</p>\",\"image_url\": \""+elec_pic+"\",\"winning_electoral_vote_number\": 270,\"advisor_url\": \""+adv_pic+"\",\"recommended_reading\":\"reading is for nerds\",\"has_visits\": 1,\"no_electoral_majority_image\": \"+hung+\"}}]"
+
+    temp_election_list = "[{\"id\":"+pk+",\"year\":"+year+",\"is_premium\":0,\"display_year\":\""+year+"\"}]"
+
+    code1+="campaignTrail_temp.election_json = "+election_json+"\ncampaignTrail_temp.temp_election_list = "+temp_election_list
+
+    //candidate_json gen
+    i=0
+    candidate_json = "JSON.parse(\"["
+
+    for (r = 0; r < getElementsById("cand_firstname").length; r++) {
+      first_name = getElementsById("cand_firstname")[r].value
+      last_name = getElementsById("cand_lastname")[r].value
+      if (getElementsById("cand_pk")[r].value == "") {
+        c_pk = 420+r
+      } else {
+        c_pk = getElementsById("cand_pk")[r].value
+      }
+      cand_desc = getElementsById("cand_desc")[r].value
+      cand_party = getElementsById("cand_pol_party")[r].value
+      cand_home = getElementsById("home_state")[r].value
+      cand_prim_col = getElementsById("cand_col_1")[r].value
+      cand_second_col = getElementsById("cand_col_2")[r].value
+      cand_port = getElementsById("cand_portrait")[r].value
+      cand_win = getElementsById("cand_win")[r].value
+      cand_lose = getElementsById("cand_lose")[r].value
+      cand_hung = getElementsById("cand_hung")[r].value
+
+      active = !getElementsById("cand_vp_check")[r].checked
+
+      if (!active) {
+        vp_desc = getElementsById("cand_vp_desc")[r].value
+      } else {
+        vp_desc = "null"
+      }
+
+      candidate_json += "{    \\\"model\\\": \\\"campaign_trail.candidate\\\",    \\\"pk\\\":"+c_pk+",    \\\"fields\\\": {      \\\"first_name\\\": \\\""+first_name+"\\\",      \\\"last_name\\\": \\\""+last_name+"\\\",      \\\"election\\\":"+pk+",      \\\"party\\\": \\\""+cand_party+"\\\",      \\\"state\\\": \\\""+cand_home+"\\\",      \\\"priority\\\":"+(num-i).toString()+",      \\\"description\\\": \\\""+cand_desc+"\\\",      \\\"color_hex\\\": \\\""+cand_prim_col+"\\\",      \\\"secondary_color_hex\\\": \\\""+cand_second_col+"\\\",      \\\"is_active\\\": "+active+",      \\\"image_url\\\": \\\""+cand_port+"\\\",      \\\"electoral_victory_message\\\": \\\""+cand_win+"\\\",      \\\"electoral_loss_message\\\": \\\""+cand_lose+"\\\",      \\\"no_electoral_majority_message\\\": \\\""+cand_hung+"\\\",      \\\"description_as_running_mate\\\": \""+vp_desc+"\",      \\\"candidate_score\\\": 1.0    }"  
+
+      if (r == num-1) {
+        candidate_json +="}]\")"
+      } else{
+        candidate_json += "},"
+      }
+    }
+
+    code1+="\n"+"campaignTrail_temp.candidate_json = "+candidate_json
+
+    // generate running mate
+
+    document.body.innerHTML += "<p><h1><b>Generated 'Code 1':</b></h1></p><textarea>"+code1+"</textarea>"
+  }
+
+  function getElementsById(elementID){
+    var elementCollection = new Array();
+    var allElements = document.getElementsByTagName("*");
+    for(i = 0; i < allElements.length; i++){
+        if(allElements[i].id == elementID)
+            elementCollection.push(allElements[i]);
+
+    }
+    return elementCollection;
+  }
+
+  base_cand_block = document.getElementById("candidate_details").innerHTML
+  num = 0
+
+  function reveal(x, y) {
+    checkboxes = getElementsById(y)
+    for (e = 0; e < checkboxes.length; e++) {
+      if (checkboxes[e].checked) {
+        veep = getElementsById(x)
+        veep[e].style.display = "block"
+      } else {
+        veep = getElementsById(x)
+        veep[e].style.display = "none"
+      }
+    }
+  }
+
+  function setCandNum() {
+    num = document.getElementById("candnum").value
+    block = document.getElementById("candidate_details")
+    block.innerHTML = ""
+
+    for (i = 0; i < num; i++) {
+      block.innerHTML += base_cand_block
+    }
+  }
+
+</script>
+<script>
+
+function loadFile(dir) {
+  jQuery.get(dir, function(data) {
+    return data
+  });
+}
+/*
+var campaignTrail_temp = {};
+
+campaignTrail_temp.election_json = JSON.parse(loadFile("election.json"))
+campaignTrail_temp.candidate_json = JSON.parse(loadFile("candidate.json"))
+campaignTrail_temp.running_mate_json = JSON.parse(loadFile("running_mate.json"));
+campaignTrail_temp.opponents_default_json = JSON.parse(loadFile("opponents_default.json"));
+campaignTrail_temp.opponents_weighted_json = campaignTrail_temp.opponents_default_json;       
+campaignTrail_temp.difficulty_level_json = JSON.parse("[{\"model\": \"campaign_trail.difficulty_level\", \"pk\": 1, \"fields\": {\"name\": \"Very Easy\", \"multiplier\": 1.2}}, {\"model\": \"campaign_trail.difficulty_level\", \"pk\": 3, \"fields\": {\"name\": \"Easy\", \"multiplier\": 1.1}}, {\"model\": \"campaign_trail.difficulty_level\", \"pk\": 4, \"fields\": {\"name\": \"Normal\", \"multiplier\": 0.97}}, {\"model\": \"campaign_trail.difficulty_level\", \"pk\": 5, \"fields\": {\"name\": \"Hard\", \"multiplier\": 0.95}}, {\"model\": \"campaign_trail.difficulty_level\", \"pk\": 6, \"fields\": {\"name\": \"Impossible\", \"multiplier\": 0.9}}]");
+campaignTrail_temp.global_parameter_json = JSON.parse("[{\"model\": \"campaign_trail.global_parameter\", \"pk\": 1, \"fields\": {\"vote_variable\": 1.125, \"max_swing\": 0.12, \"start_point\": 0.94, \"candidate_issue_weight\": 10.0, \"running_mate_issue_weight\": 3.0, \"issue_stance_1_max\": -0.71, \"issue_stance_2_max\": -0.3, \"issue_stance_3_max\": -0.125, \"issue_stance_4_max\": 0.125, \"issue_stance_5_max\": 0.3, \"issue_stance_6_max\": 0.71, \"global_variance\": 0.01, \"state_variance\": 0.005, \"question_count\": 25, \"default_map_color_hex\": \"#C9C9C9\", \"no_state_map_color_hex\": \"#999999\"}}]");
+campaignTrail_temp.candidate_dropout_json = JSON.parse("[{\"model\": \"campaign_trail.candidate_dropout\", \"pk\": 1, \"fields\": {\"candidate\": 36, \"affected_candidate\": 18, \"probability\": 1.0}}]");
+campaignTrail_temp.temp_election_list = JSON.parse(loadFile("election_list.json"));
+campaignTrail_temp.show_premium = true;
+campaignTrail_temp.premier_ab_test_version = -1;
+*/
+</script>
+<script src="../static/js/campaign_trail_2020072001.js"></script>
+</html>
