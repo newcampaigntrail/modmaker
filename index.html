@@ -86,7 +86,7 @@ Candidate Number: <input id="candnum"/><button id="setCand" onclick="setCandNum(
       hung = document.getElementById("no_elec_maj_photo").value
     }
 
-    election_json = JSON.stringify([{"model": "campaign_trail.election","pk":pk,"fields":{"year":year,"summary":"<p>"+desc+"</p>","image_url": "\"+elec_pic+\"","winning_electoral_vote_number": 270,"advisor_url": "\"+adv_pic+\"","recommended_reading":"reading is for nerds","has_visits": 1,"no_electoral_majority_image": "\"+hung+\""}}]);
+    election_json = JSON.stringify([{"model": "campaign_trail.election","pk":pk,"fields":{"year":year,"summary":"<p>"+desc+"</p>","image_url": elec_pic,"winning_electoral_vote_number": 270,"advisor_url": adv_pic,"recommended_reading":"reading is for nerds","has_visits": 1,"no_electoral_majority_image": hung}}]);
 
     temp_election_list = "[{\"id\":"+pk+",\"year\":"+year+",\"is_premium\":0,\"display_year\":\""+year+"\"}]"
 
@@ -124,12 +124,12 @@ Candidate Number: <input id="candnum"/><button id="setCand" onclick="setCandNum(
       if (!active) {
         vp_comrade_id = getElementsById("cand_pk")[Number(vp_comrade)].value
         vp_desc = getElementsById("cand_vp_desc")[r].value
-        vp_json.append({"model": "campaign_trail.running_mate","pk": Number(running_combo),"fields": {"candidate": Number(vp_comrade_id),"running_mate": Number(c_pk)}})
+        vp_json.push({"model": "campaign_trail.running_mate","pk": Number(running_combo),"fields": {"candidate": Number(vp_comrade_id),"running_mate": Number(c_pk)}})
       } else {
         vp_desc = "null"
       }
 
-      candidate_json += "{    \\\"model\\\": \\\"campaign_trail.candidate\\\",    \\\"pk\\\":"+c_pk+",    \\\"fields\\\": {      \\\"first_name\\\": \\\""+first_name+"\\\",      \\\"last_name\\\": \\\""+last_name+"\\\",      \\\"election\\\":"+pk+",      \\\"party\\\": \\\""+cand_party+"\\\",      \\\"state\\\": \\\""+cand_home+"\\\",      \\\"priority\\\":"+(num-i).toString()+",      \\\"description\\\": \\\""+cand_desc+"\\\",      \\\"color_hex\\\": \\\""+cand_prim_col+"\\\",      \\\"secondary_color_hex\\\": \\\""+cand_second_col+"\\\",      \\\"is_active\\\": "+active+",      \\\"image_url\\\": \\\""+cand_port+"\\\",      \\\"electoral_victory_message\\\": \\\""+cand_win+"\\\",      \\\"electoral_loss_message\\\": \\\""+cand_lose+"\\\",      \\\"no_electoral_majority_message\\\": \\\""+cand_hung+"\\\",      \\\"description_as_running_mate\\\": \""+vp_desc+"\",      \\\"candidate_score\\\": 1.0    }"  
+      candidate_json += "{    \\\"model\\\": \\\"campaign_trail.candidate\\\",    \\\"pk\\\":"+c_pk+",    \\\"fields\\\": {      \\\"first_name\\\": \\\""+first_name+"\\\",      \\\"last_name\\\": \\\""+last_name+"\\\",      \\\"election\\\":"+pk+",      \\\"party\\\": \\\""+cand_party+"\\\",      \\\"state\\\": \\\""+cand_home+"\\\",      \\\"priority\\\":"+(num-i).toString()+",      \\\"description\\\": \\\""+cand_desc+"\\\",      \\\"color_hex\\\": \\\""+cand_prim_col+"\\\",      \\\"secondary_color_hex\\\": \\\""+cand_second_col+"\\\",      \\\"is_active\\\": "+active+",      \\\"image_url\\\": \\\""+cand_port+"\\\",      \\\"electoral_victory_message\\\": \\\""+cand_win+"\\\",      \\\"electoral_loss_message\\\": \\\""+cand_lose+"\\\",      \\\"no_electoral_majority_message\\\": \\\""+cand_hung+"\\\",      \\\"description_as_running_mate\\\": \\\""+vp_desc+"\\\",      \\\"candidate_score\\\": 1.0    }"  
 
       if (r == getElementsById("cand_firstname").length-1) {
         candidate_json +="}]\")"
